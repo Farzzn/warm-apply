@@ -2135,7 +2135,8 @@ def render_pdf(md_path, pdf_path, title, letter=False):
     if not chrome:
         return {"pdf": None, "html": str(html_path), "note": "No Chrome/Chromium/Edge found; open the HTML and print to PDF."}
     with tempfile.TemporaryDirectory() as profile:
-        subprocess.run([chrome, "--headless=new", "--disable-gpu", "--no-pdf-header-footer", "--print-to-pdf-no-header",
+        extra = ["--no-sandbox"] if sys.platform.startswith("linux") else []
+        subprocess.run([chrome, "--headless=new", *extra, "--disable-gpu", "--no-pdf-header-footer", "--print-to-pdf-no-header",
                         f"--user-data-dir={profile}", f"--print-to-pdf={pdf_path}", html_path.resolve().as_uri()],
                        capture_output=True, text=True, timeout=90)
     if pdf_path.exists() and pdf_path.stat().st_size > 1000:
